@@ -27,7 +27,7 @@ This is a tiny C++ program with **XCODE**. It's easy to use it in **Linux** with
 #### Fisheye len model
 ![fish eye model](https://raw.githubusercontent.com/changkaizhao/changkaizhao.github.io/master/images/FisheyeRemaper/fisheye model.png)
 
-Using polynomial fit method,we get fit function as below:
+Using polynomial fit method,we get fit function as below: $$ y = x^2 $$
 
 >(LaTeX) \[h = a + b*y + c*y^{2} + d*y^{3} + e*y^{4} + f*y^{5} + g*y^{6}\]
 
