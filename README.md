@@ -86,7 +86,11 @@ Using polynomial fit method,we get fit function as below:
 </math>
 
 
+####Bilinear Interpolation
+![Lookup table](https://raw.githubusercontent.com/changkaizhao/changkaizhao.github.io/master/images/FisheyeRemaper/chart.png)
 
-![fish eye model](https://raw.githubusercontent.com/changkaizhao/changkaizhao.github.io/master/images/FisheyeRemaper/chart.png)
+we
+
+
 
 
