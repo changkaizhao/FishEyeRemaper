@@ -277,7 +277,7 @@ FishEyeSphereRemaper::~FishEyeSphereRemaper(){
 
 //======================================================
 //
-//                  FishEyeRectRemaper
+//                  FishEyeRectRemaper/Barrel
 //
 //======================================================
 #pragma mark - FishEyeRectRemaper
