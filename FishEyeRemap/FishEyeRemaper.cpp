@@ -8,7 +8,7 @@
 
 #include "FishEyeRemaper.hpp"
 
-
+int SHIFTMAX = 1 << 15;
 
 cv::Mat flattable; //save longitude and latitude
 cv::Mat flatindex; //save x,y coordinates in fisheye image
@@ -27,8 +27,8 @@ unsigned int Output_Height;
 cv::Mat factorTable;
 cv::Mat indextable;
 void initfactorTable(){
-    factorTable = cv::Mat(32,32,CV_32FC4);
-    
+    //factorTable = cv::Mat(32,32,CV_32FC4);
+    factorTable = cv::Mat(32,32,CV_32SC4);
 //    double t = (double)cv::getTickCount();
 //    if (factorTable.isContinuous()) {
 //        float *pdata = (float*)factorTable.data;
@@ -59,10 +59,14 @@ void initfactorTable(){
             float cc = 1.0 - aa;
             float bb = (float)j/31.0;
             float dd = 1.0 - bb;
-            factorTable.at<cv::Vec4f>(j,i)[0] = cc * dd;
-            factorTable.at<cv::Vec4f>(j,i)[1] = aa * dd;
-            factorTable.at<cv::Vec4f>(j,i)[2] = cc * bb;
-            factorTable.at<cv::Vec4f>(j,i)[3] = aa * bb;
+//            factorTable.at<cv::Vec4f>(j,i)[0] = cc * dd;
+//            factorTable.at<cv::Vec4f>(j,i)[1] = aa * dd;
+//            factorTable.at<cv::Vec4f>(j,i)[2] = cc * bb;
+//            factorTable.at<cv::Vec4f>(j,i)[3] = aa * bb;
+            factorTable.at<cv::Vec4i>(j,i)[0] = cc * dd * SHIFTMAX;
+            factorTable.at<cv::Vec4i>(j,i)[1] = aa * dd * SHIFTMAX;
+            factorTable.at<cv::Vec4i>(j,i)[2] = cc * bb * SHIFTMAX;
+            factorTable.at<cv::Vec4i>(j,i)[3] = aa * bb * SHIFTMAX;
         }
     }
 
@@ -163,10 +167,18 @@ cv::Mat FishEyeRemaper::remap(const cv::Mat inputImg){
                 uchar cc = inputImg.at<uchar>(flatindex.at<cv::Vec2w>(j,i)[1],flatindex.at<cv::Vec2w>(j,i)[0]+1);
                 uchar dd = inputImg.at<uchar>(flatindex.at<cv::Vec2w>(j,i)[1]+1,flatindex.at<cv::Vec2w>(j,i)[0]+1);
                 
-                result.at<uchar>(j,i) = (uchar)((float)aa * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
-                                                (float)bb * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
-                                                (float)cc * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
-                                                (float)dd * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
+//                result.at<uchar>(j,i) = (uchar)((float)aa * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
+//                                                (float)bb * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
+//                                                (float)cc * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
+//                                                (float)dd * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
+                
+               int v = ((int)aa * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
+                        (int)bb * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
+                        (int)cc * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
+                        (int)dd * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
+                
+                result.at<uchar>(j,i) = v >> 15;
+
                 
             }
         }
@@ -180,12 +192,16 @@ cv::Mat FishEyeRemaper::remap(const cv::Mat inputImg){
                     uchar dd = inputImg.at<cv::Vec3b>(flatindex.at<cv::Vec2w>(j,i)[1]+1,flatindex.at<cv::Vec2w>(j,i)[0]+1)[k];
                     
                     
-                    result.at<cv::Vec3b>(j,i)[k] = (uchar)((float)aa * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
-                                                           (float)bb * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
-                                                           (float)cc * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
-                                                           (float)dd * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
-                    
-                    
+//                    result.at<cv::Vec3b>(j,i)[k] = (uchar)((float)aa * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
+//                                                           (float)bb * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
+//                                                           (float)cc * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
+//                                                           (float)dd * factorTable.at<cv::Vec4f>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
+                    int v = ((int)aa * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[0]+
+                           (int)bb * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[1]+
+                           (int)cc * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[2]+
+                           (int)dd * factorTable.at<cv::Vec4i>(factorindex.at<cv::Vec2b>(j,i)[0],factorindex.at<cv::Vec2b>(j,i)[1])[3]);
+
+                    result.at<cv::Vec3b>(j,i)[k] = v >> 15;
                 }
             }
         }
