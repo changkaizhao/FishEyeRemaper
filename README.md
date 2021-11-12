@@ -95,8 +95,8 @@ we use bilinear interpolation method to get ouput values.Details show in the cha
 In remaper,two expanding ways(sphere and barrel) are implemented.
 
 
-###If you have any questions please feel free to contact me or report issues.
->Email:changkaizhao1006@gmail.com
+###If you have any questions please feel free to report issues.
+
 
 
 
